@@ -5,6 +5,11 @@
 
 **Developed by:** (developed by https://github.com/unidentifiedcyberghost x https://github.com/pinoyunknown : white-hat : Philippine Cybersecurity Experts)
 
+[![Instagram](https://img.shields.io/badge/Instagram-pinoyunknown-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/pinoyunknown)
+[![X](https://img.shields.io/badge/X-hPsuomynonA-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/hPsuomynonA)
+[![GitHub](https://img.shields.io/badge/GitHub-unidentifiedcyberghost-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/unidentifiedcyberghost)
+[![GitHub](https://img.shields.io/badge/GitHub-pinoyunknown-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/pinoyunknown)
+
 ![Version](https://img.shields.io/badge/Version-2.0.0-blueviolet?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.8+-cyan?style=for-the-badge&logo=python)
 
@@ -191,7 +196,7 @@ If you prefer a standalone executable (Windows .exe or Linux single-file binary)
 
 - "adb not found": ensure Android Platform Tools are installed and `adb` is on PATH.
 - Colors/animations look broken on Windows cmd: use Windows Terminal or PowerShell, or disable banner animations.
-- msfvenom or scrcpy features show "not found": install those external tools if you need those features.
+- msfvenom or scrcpy features show "not found": install those external tools if you need the related features.
 
 
 ## Contributing
