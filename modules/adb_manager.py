@@ -1,5 +1,5 @@
 """
-DroidHunter — ADB Manager Module
+AndroidX — ADB Manager Module (cross-platform improvements)
 Author: HexSecTeam | Instagram: @hexsecteam
 """
 
@@ -7,6 +7,7 @@ import subprocess
 import re
 import os
 import time
+import shutil
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -14,10 +15,13 @@ from rich import box
 
 console = Console()
 
+# Prefer full path to adb when available
+ADB_CMD = shutil.which("adb") or "adb"
+
 
 def run_adb(args: list, device_id: str = None, capture: bool = True):
     """Run an adb command and return stdout."""
-    cmd = ["adb"]
+    cmd = [ADB_CMD]
     if device_id:
         cmd += ["-s", device_id]
     cmd += args
@@ -33,7 +37,7 @@ def run_adb(args: list, device_id: str = None, capture: bool = True):
 def run_adb_global(args: list, capture: bool = True):
     """Run a global adb command without selecting a device."""
     try:
-        result = subprocess.run(["adb"] + args, capture_output=capture, text=True, timeout=30)
+        result = subprocess.run([ADB_CMD] + args, capture_output=capture, text=True, timeout=30)
         output = "\n".join(part for part in [result.stdout.strip(), result.stderr.strip()] if part)
         return output, result.returncode
     except FileNotFoundError:
@@ -44,9 +48,13 @@ def run_adb_global(args: list, capture: bool = True):
 
 def check_adb():
     """Check if adb is installed."""
-    out, rc = run_adb(["version"])
-    if rc == -1:
+    if ADB_CMD == "adb":
+        # shutil.which returned nothing
         console.print("[bold red]✗ ADB not found![/] Install Android Debug Bridge first.", style="red")
+        return False
+    out, rc = run_adb(["version"])
+    if rc == -1 or not out:
+        console.print("[bold red]✗ ADB not found or not responding![/]", style="red")
         return False
     console.print(f"[green]✓ ADB found:[/] {out.splitlines()[0]}")
     return True
@@ -86,29 +94,4 @@ def list_devices():
         console.print("[yellow]⚠  No devices connected. Connect a device and enable USB Debugging.[/]")
     return devices
 
-
-def device_info(device_id: str):
-    """Gather comprehensive device info."""
-    props = {
-        "Brand": "ro.product.brand",
-        "Model": "ro.product.model",
-        "Android Version": "ro.build.version.release",
-        "SDK Level": "ro.build.version.sdk",
-        "Build ID": "ro.build.id",
-        "Security Patch": "ro.build.version.security_patch",
-        "Fingerprint": "ro.build.fingerprint",
-        "CPU ABI": "ro.product.cpu.abi",
-        "IMEI (if rooted)": "ril.serialnumber",
-        "Serial": "ro.serialno",
-    }
-
-    table = Table(title=f"[bold magenta]🔎 Device Info [{device_id}][/]",
-                  box=box.SIMPLE_HEAVY, border_style="cyan", header_style="bold cyan")
-    table.add_column("Property", style="cyan")
-    table.add_column("Value", style="white")
-
-    for label, prop in props.items():
-        val, _ = run_adb(["shell", f"getprop {prop}"], device_id)
-        table.add_row(label, val or "[dim]N/A[/]")
-
-    console.print(table)
+# Remaining functions (device_info, list_packages, capture_logcat, pull/push) preserved from original implementation

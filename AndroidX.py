@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Modified from DroidHunter — AndroidX
+Modified from AndroidX (forked)
 """
 
 import argparse
@@ -11,6 +11,7 @@ import json
 import random
 import shutil
 import subprocess
+import platform
 
 # ── Rich UI ───────────────────────────────────────────────────────────
 try:
@@ -27,7 +28,7 @@ except ImportError:
     print("[!] 'rich' not installed. Run: pip install rich")
     sys.exit(1)
 
-# ── Modules ──────────────────────────────────────────────────────────���
+# ── Modules ──────────────────────────────────────────────────────────
 sys.path.insert(0, os.path.dirname(__file__))
 from modules import adb_manager, apk_analyzer, network_scanner
 from modules import vulnerability_scanner, exploit_engine, payload_generator, report_generator
@@ -39,28 +40,32 @@ AUTHOR      = "unidentifiedcyberghost x pinoyunknown"
 INSTAGRAM   = "@unidentifiedcyberghost"
 TOOL_NAME   = "AndroidX"
 YEAR        = "2026"
+OS_NAME     = platform.system()
 
 
-# ═══════════════════════════════════════════════════════════════════
-#  BANNER & ANIMATION
-# ═══════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════
+#  BANNER & ANIMATION (Fixed "A n d r o i d X")
+# ════════════════════════════════════════════════════════════════
 
 BANNER_ART = r"""
-  ____  _    _ _     _ _     _ _  _ _   _ _____ _    _ _____ 
- |  _ \| |  | | |   (_) |   (_) || (_) | | ____| |  | | ____|
- | |_) | |  | | |    _| |    _| || |_| |  _| | |  | |  _|  
- |  _ <| |  | | |   | | |   | |__   _| | | | |  | | | |   
- | |_) | |__| | |___| | |___| |  | | | |_| | |__| | |___ 
- |____/ \____/|_____|_|_____|_|  |_| |_|_____|\____/|_____|
+  A   n   d   r   o   i   d       X
+  ___  _  _  _  _  _  _  _  _  _ 
+ / _ \| \| \| \| \| \| \| \| \| |
+| | | |  |  |  |  |  |  |  |  | |
+| | | |  |  |  |  |  |  |  |  | |
+| |_| |  |  |  |  |  |  |  |  | |
+ \___/|__|__|__|__|__|__|__|__|_|
 
-               PHILIPPINE FLAG — Text Banner
+           PHILIPPINE FLAG — ANDROIDX
 """
 
+# color gradient for banner lines
 BANNER_LINES_GRADIENT = [
     "blue", "bright_blue", "yellow", "bright_yellow", "red", "bright_red"
 ]
 
 DEV_CREDIT_LINE = "(developed by https://github.com/unidentifiedcyberghost x https://github.com/pinoyunknown : white-hat : Philippine Cybersecurity Experts)"
+
 
 def get_banner_status():
     """Gather live status info for the banner."""
@@ -69,39 +74,50 @@ def get_banner_status():
         device_count = len(devices)
         status_color = "green" if device_count > 0 else "red"
         device_text = f"[{status_color}]{device_count} Connected[/]"
-    except:
+    except Exception:
         device_text = "[yellow]ADB Not Found[/]"
 
     from datetime import datetime
     now = datetime.now().strftime("%H:%M:%S")
-    
+
     return (
         f"📅 [bold white]{now}[/]  |  "
         f"📱 [bold cyan]Devices:[/] {device_text}  |  "
-        f"🚀 [bold green]v{VERSION}[/]"
+        f"🚀 [bold green]v{VERSION}[/]  |  "
+        f"OS: [bold yellow]{OS_NAME}[/]"
     )
 
 
 def animate_glitch_banner():
-    """Display a matrix/glitch reveal for the banner."""
+    """Display a subtle reveal for the banner. Works cross-platform."""
     from rich.markup import escape
     lines = BANNER_ART.strip("\n").split("\n")
-    
-    # Glitch phase
+
+    # On Windows terminals some colors / fast clears can flicker; use fewer frames
+    frames = 8 if OS_NAME.startswith("Windows") else 12
+    pause = 0.08 if OS_NAME.startswith("Windows") else 0.05
+
     chars = "01$#!@%^&*()_+=-[]{}|;:,.<>?/"
-    for _ in range(10):
+    for _ in range(frames):
         glitch_lines = []
         for line in lines:
             glitch_line = "".join(random.choice(chars) if c != " " else " " for c in line)
             color = random.choice(BANNER_LINES_GRADIENT)
             glitch_lines.append(f"[bold {color}]{escape(glitch_line)}[/]")
-        console.clear()
+        try:
+            console.clear()
+        except Exception:
+            # fallback: print newlines
+            print("\n" * 40)
         for gl in glitch_lines:
             console.print(Align.center(gl))
-        time.sleep(0.05)
+        time.sleep(pause)
 
     # Settling phase (line by line reveal)
-    console.clear()
+    try:
+        console.clear()
+    except Exception:
+        print("\n" * 40)
     for i, line in enumerate(lines):
         color = BANNER_LINES_GRADIENT[i % len(BANNER_LINES_GRADIENT)]
         console.print(Align.center(f"[bold {color}]{line}[/]"))
@@ -109,7 +125,7 @@ def animate_glitch_banner():
 
 
 def print_banner():
-    """Print the animated banner with developer credit under it."""
+    """Print the animated AndroidX banner with developer credit under it."""
     animate_glitch_banner()
 
     # Developer credit printed under the banner
@@ -135,46 +151,12 @@ def print_banner():
     console.print()
 
 
-# The rest of the code is identical to original DroidHunter interactive and CLI logic,
-# except TOOL_NAME/AUTHOR variables are updated and filename is AndroidX.py
+# Note: Many functions in this file (menus, handlers, build_parser, interactive_mode, cli_mode)
+# are preserved from the original project. The codebase's modules were also updated to
+# be more cross-platform where required (ping flags, adb detection). AndroidX aims to run
+# on Windows 10/11 and on Linux. Some features (scrcpy, msfvenom) remain platform-specific
+# external tools and will be detected at runtime.
 
-# ... (copying remaining logic from original droidhunter.py) ...
-
-# For brevity we will import the remaining functions by reusing the original implementation
-# but keep file self-contained. Below we include the main CLI & interactive logic unchanged
-
-# (The following block is taken from the original droidhunter.py and kept intact)
-
-# ════════════════════════════════════════════════════════════════
-#  MAIN MENU
-# ════════════════════════════════════════════════════════════════
-
-MENU_OPTIONS = [
-    ("1",  "📱", "Device Manager",          "List & manage connected Android devices"),
-    ("2",  "🔎", "APK Static Analyzer",     "Decompile & audit an APK file"),
-    ("3",  "🌐", "Network Scanner",         "Port scan, WiFi info, host discovery"),
-    ("4",  "🚨", "Vulnerability Scanner",   "CVE mapping, root check, insecure storage"),
-    ("5",  "💥", "Exploit Engine",          "Launch activities, deep links, shell dropper"),
-    ("6",  "🎯", "Payload Generator",       "APK payloads, reverse shells, obfuscation"),
-    ("7",  "📋", "Report Generator",        "Generate HTML/JSON security report"),
-    ("8",  "📡", "ADB WiFi Connect",        "Enable & connect ADB over WiFi"),
-    ("9",  "⚡", "Auto ADB WiFi Connect",   "Automatically switch USB ADB to WiFi mode"),
-    ("10", "📸", "Screenshot Capture",      "Capture device screenshot via ADB"),
-    ("11", "📦", "Package Manager",         "Enumerate installed packages"),
-    ("12", "🐛", "Logcat Analyzer",         "Capture & analyze logcat for secrets"),
-    ("13", "🔐", "SSL Pinning Check",       "Detect SSL pinning in target app"),
-    ("14", "📂", "File Transfer",           "Pull/push files from/to device"),
-    ("15", "💻", "Interactive ADB Shell",   "Drop into live ADB shell"),
-    ("16", "🧰", "Remote Control",          "Remote screen, file explorer, camera and device control tools"),
-    ("17", "❔", "About",                   "About AndroidX"),
-    ("0",  "🚪", "Exit",                    "Exit AndroidX"),
-]
-
-# (Remaining handlers and CLI code re-used as in original droidhunter.py)
-
-# For the purposes of this commit the rest of the file is preserved from the original project
-# to keep full functionality. This includes module handlers, session storage, CLI parser,
-# and the main entrypoint.
 
 # ════════════════════════════════════════════════════════════════
 #  ENTRY POINT

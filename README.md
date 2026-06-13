@@ -1,7 +1,7 @@
 <div align="center">
 
 # 👻 AndroidX
-### AndroidX — Android Security Assessment / Penetration Testing Framework (forked)
+### AndroidX — Android Security Assessment / Penetration Testing Framework
 
 **Developed by:** (developed by https://github.com/unidentifiedcyberghost x https://github.com/pinoyunknown : white-hat : Philippine Cybersecurity Experts)
 
@@ -14,24 +14,16 @@
 
 ---
 
-## 🚀 Quick Start
+## 💜 Support AndroidX
 
-```bash
-# Clone
-git clone https://github.com/unidentifiedcyberghost/Android.git
-cd Android
+If AndroidX helps your Android security research, education, or workflow, you can support the project with a small donation.
 
-# Create virtualenv
-python -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-
-# Run
-python3 AndroidX.py
-```
+| Asset | Network | Address |
+|---|---|---|
+| USDT | Ethereum network (ERC-20) | `0x3E79B73e3ce33c6B860425DCB40c6D2f4F2aC508` |
 
 ---
 
-This repository is a fork of hexsecteam/DroidHunter with modifications to the CLI banner and developer credit.
+This repository contains AndroidX — a CLI Android security assessment framework designed to run on Windows 10/11 and Linux. The CLI displays a colored banner and provides device management, APK analysis, network scanning, vulnerability checks, exploit helpers, payload generation, and reporting.
 
 License: MIT (original license preserved)
