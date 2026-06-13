@@ -42,6 +42,9 @@ TOOL_NAME   = "AndroidX"
 YEAR        = "2026"
 OS_NAME     = platform.system()
 
+# Glitch animation toggle
+GLITCH_ENABLED = True
+
 
 # ════════════════════════════════════════════════════════════════
 #  BANNER & ANIMATION (Fixed "A n d r o i d X")
@@ -118,6 +121,34 @@ def animate_glitch_banner():
         color = BANNER_LINES_GRADIENT[i % len(BANNER_LINES_GRADIENT)]
         console.print(Align.center(f"[bold {color}]{line}[/]"))
         time.sleep(0.04)
+
+
+def glitch_print_center(text: str, frames: int = 8, intensity: float = 0.35, pause: float = 0.04):
+    """Show a quick glitch animation for a centered text block.
+
+    This prints several frames with random character substitutions then the original text.
+    It intentionally prints frames above the following content to avoid complex cursor control across terminals.
+    """
+    if not GLITCH_ENABLED:
+        console.print(Align.center(text))
+        return
+
+    glyphs = "█▓▒░#@%$&*<>?/|^~☆★01ABCxyz"
+    lines = text.strip("\n").split("\n")
+
+    for _ in range(frames):
+        for line in lines:
+            glitched = []
+            for ch in line:
+                if ch == " " or random.random() > intensity:
+                    glitched.append(ch)
+                else:
+                    glitched.append(random.choice(glyphs))
+            console.print(Align.center(f"[bold bright_cyan]{''.join(glitched)}[/]"))
+        time.sleep(pause)
+    # print the clean text
+    for line in lines:
+        console.print(Align.center(f"[bold cyan]{line}[/]"))
 
 
 def print_banner():
@@ -206,8 +237,13 @@ def _get_session() -> dict:
 # Helper functions and menus
 
 def print_main_menu():
+    # Optionally show a quick glitch intro for the menu header
+    header = "\n👻  {name}  —  Main Menu\n".format(name=TOOL_NAME)
+    if GLITCH_ENABLED:
+        glitch_print_center(header, frames=6, intensity=0.28, pause=0.03)
+
     t = Table(
-        title=f"\n[bold cyan]👻  {TOOL_NAME}  —  Main Menu[/]\n",
+        title=f"\n[bold bright_cyan]👻  {TOOL_NAME}  —  Main Menu[/]\n",
         box=box.ROUNDED,
         border_style="cyan",
         header_style="bold white",
@@ -227,8 +263,12 @@ def print_main_menu():
 
 
 def print_remote_control_menu():
+    header = "\n🎛️  {name}  —  Remote Control\n".format(name=TOOL_NAME)
+    if GLITCH_ENABLED:
+        glitch_print_center(header, frames=4, intensity=0.28, pause=0.03)
+
     t = Table(
-        title=f"\n[bold cyan]🎛️  {TOOL_NAME}  —  Remote Control[/]\n",
+        title=f"\n[bold bright_cyan]🎛️  {TOOL_NAME}  —  Remote Control[/]\n",
         box=box.ROUNDED,
         border_style="cyan",
         header_style="bold white",
