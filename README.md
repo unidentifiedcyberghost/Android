@@ -1,204 +1,159 @@
-<div align="center">
+## CLI Wrappers (scripts/)
 
-# 👻 AndroidX
-### AndroidX — Android Security Assessment / Penetration Testing Framework
+To support automation and CI, AndroidX includes small wrapper scripts under `scripts/` that provide minimal argparse-driven CLIs for common functionality. They import the corresponding `modules/` code so they are thin shells that are easy to integrate into pipelines.
 
-**Developed by:** (developed by https://github.com/unidentifiedcyberghost x https://github.com/pinoyunknown : white-hat : Philippine Cybersecurity Experts)
+Note: place the scripts in `scripts/` and make them executable:
+- mkdir -p scripts
+- paste the scripts (adb_cli.py, analyze_apk.py, port_scan.py, generate_report.py)
+- chmod +x scripts/*.py
 
-![Version](https://img.shields.io/badge/Version-2.0.0-blueviolet?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.8+-cyan?style=for-the-badge&logo=python)
+### adb_cli.py
+Purpose: thin wrapper around modules/adb_manager for listing devices, checking adb, and running arbitrary adb subcommands.
 
-> ⚠️ **For authorized security testing and educational purposes only.**
+Usage:
+- List devices (prints JSON array of device objects):
+  - python scripts/adb_cli.py list
+- Check ADB availability:
+  - python scripts/adb_cli.py check
+- Run arbitrary adb args (pass adb args after `--`):
+  - python scripts/adb_cli.py run --device DEVICE_SERIAL -- shell id
 
-</div>
+Example:
+- python scripts/adb_cli.py run --device emulator-5554 -- shell getprop ro.build.version.release
+
+Output format:
+- JSON with keys such as returncode and stdout for `run`, and arrays/objects for `list` and `check`.
+
+### analyze_apk.py
+Purpose: run static analysis on an APK (wraps modules/apk_analyzer.analyze_apk) and optionally write JSON output.
+
+Usage:
+- Print results to stdout:
+  - python scripts/analyze_apk.py path/to/app.apk
+- Save to JSON:
+  - python scripts/analyze_apk.py path/to/app.apk --out findings.json
+
+Example:
+- python scripts/analyze_apk.py examples/app.apk --out out/apk_findings.json
+
+Output:
+- JSON object representing findings, permissions, CVEs, secrets, etc. (matching module return format).
+
+### port_scan.py
+Purpose: quick multithreaded port scanner wrapper for modules/network_scanner.port_scan.
+
+Usage:
+- Scan default/common ports:
+  - python scripts/port_scan.py 192.168.1.5
+- Scan explicit ports:
+  - python scripts/port_scan.py 192.168.1.5 --ports 22,80,443
+- Set per-port timeout:
+  - python scripts/port_scan.py 192.168.1.5 --timeout 0.5
+
+Example:
+- python scripts/port_scan.py 10.0.0.42 --ports 22,80,5555
+
+Output:
+- JSON: { "target": "<target>", "open_ports": [ <port ints> ] }
+
+### generate_report.py
+Purpose: produce a JSON or HTML report from findings/session JSON. If `modules.report_generator` exposes a `generate_report` function, the wrapper will try to use it; otherwise it falls back to writing raw JSON or a simple HTML file.
+
+Usage:
+- Generate HTML from findings:
+  - python scripts/generate_report.py --findings findings.json --out report.html --format html
+- Generate JSON output (sanity/roundtrip):
+  - python scripts/generate_report.py --findings findings.json --out summary.json --format json
+
+Example:
+- python scripts/generate_report.py --findings out/apk_findings.json --out reports/report.html --format html
+
+Fallback behavior:
+- If no `modules.report_generator` implementation is present, `--format json` writes the raw JSON and `--format html` writes a basic HTML page with the JSON embedded.
 
 ---
 
-## What is AndroidX?
+## Full Command Reference (Interactive + CLI Mode)
 
-AndroidX is a CLI-based Android security assessment and penetration testing framework designed for ethical hackers, security researchers, and developers to perform authorized testing and auditing of Android devices and applications. AndroidX provides device management, APK static analysis, network scanning, vulnerability checks, exploit helpers, payload generation, remote control helpers, and professional report generation — all from a single terminal interface.
+### Interactive main menu (launch via `python AndroidX.py` or `python AndroidX.py --interactive`)
+Menu options (select the number in the TUI):
+- 1  📱 Device Manager — List & manage connected Android devices (ADB)
+- 2  🔎 APK Static Analyzer — Decompile & audit an APK file
+- 3  🌐 Network Scanner — Port scan, WiFi info, host discovery
+- 4  🚨 Vulnerability Scanner — CVE mapping, root detection, insecure storage checks
+- 5  💥 Exploit Engine — Launch activities, deep links, shell dropper (use responsibly)
+- 6  🎯 Payload Generator — Build APK payloads, reverse shells, apply obfuscation
+- 7  📋 Report Generator — Generate HTML/JSON security report from session/findings
+- 8  📡 ADB WiFi Connect — Enable & connect ADB over WiFi
+- 9  ⚡ Auto ADB WiFi Connect — Auto-switch USB ADB to TCP/IP WiFi mode
+- 10 📸 Screenshot Capture — Capture device screenshot via ADB
+- 11 📦 Package Manager — Enumerate installed packages on device
+- 12 🐛 Logcat Analyzer — Capture & analyze logcat output for secrets
+- 13 🔐 SSL Pinning Check — Detect potential SSL pinning in an app
+- 14 📂 File Transfer — Pull/push files to/from device
+- 15 💻 Interactive ADB Shell — Open an interactive adb shell on device
+- 16 🧰 Remote Control — Remote screen, file explorer, camera and control tools (scrcpy, etc.)
+- 17 ❔ About — Show version/credits
+- 0  🚪 Exit
 
-Core goals:
-- Provide a unified, user-friendly CLI for common Android security workflows.
-- Offer both interactive and scripted CLI modes for automation and repeatable testing.
-- Work cross-platform (Windows 10/11 and Linux) with clear runtime checks for optional external tooling.
+Each menu item guides you through required prompts (device serial, file path, IP address, etc.). Findings can be saved to the session and exported via Reports.
 
+### CLI flags (AndroidX.py)
+- --interactive, -i
+  - Start interactive TUI (default way to use the tool for humans).
+- --version, -v
+  - Print version and exit.
+- --no-banner
+  - Disable animated ASCII banner (show static banner + status instead).
+- --no-glitch
+  - Disable per-header glitch animation (quiet mode). Overrides other glitch flags.
+- --glitch-frames INT
+  - Override default header glitch frame count (int).
+- --glitch-intensity FLOAT
+  - Override header glitch intensity (0.0–1.0).
+- --glitch-pause FLOAT
+  - Override pause (seconds) between glitch frames.
 
-## Features
+Examples:
+- Start interactive with quiet UI:
+  - python AndroidX.py --interactive --no-glitch --no-banner
+- Start with adjusted glitch:
+  - python AndroidX.py --glitch-frames 4 --glitch-intensity 0.12 --glitch-pause 0.02
 
-- Device Manager: list devices, device info, screenshots, logcat capture, file transfer, interactive ADB shell
-- APK Static Analyzer: permission audit, hardcoded secret detection, exported components, basic vulnerability heuristics
-- Network Scanner: port scanning, subnet discovery, WiFi info
-- Vulnerability Scanner: CVE mapping heuristics, root detection, insecure storage checks
-- Exploit Helpers: activity launch, deep-link fuzzer, broadcast trigger, content provider extraction
-- Payload Generator: msfvenom wrapper command templates, adb payload scripts, reverse shell commands, obfuscation utilities
-- Report Generator: HTML/JSON report export and CLI summary tables
+### Wrapper commands summary (scripts/)
+- scripts/adb_cli.py
+  - list, check, run
+  - e.g. python scripts/adb_cli.py list
+- scripts/analyze_apk.py
+  - analyze APK, optionally write JSON
+  - e.g. python scripts/analyze_apk.py app.apk --out findings.json
+- scripts/port_scan.py
+  - port scanning helper
+  - e.g. python scripts/port_scan.py 192.168.1.5 --ports 22,80,443
+- scripts/generate_report.py
+  - generate report from saved findings/session JSON
+  - e.g. python scripts/generate_report.py --findings findings.json --out report.html --format html
 
+---
 
-## Requirements
+## Example automation workflows
 
-- Python 3.8+ (3.10/3.11 recommended)
-- pip
-- Modules (install via requirements.txt): rich, requests
-- Optional external tools for full functionality:
-  - adb (Android Platform Tools) — required for device interactions
-  - scrcpy — optional (remote screen streaming)
-  - msfvenom / Metasploit — optional (payload generation)
-  - frida / objection — optional (dynamic instrumentation)
-  - mitmproxy — optional (network interception)
+1) Auto-run APK analysis and produce JSON:
+- python scripts/analyze_apk.py app.apk --out findings.json
 
+2) Scan the app build server for exposed adb port:
+- python scripts/port_scan.py build-server.example.com --ports 5555,22
 
-## Legal Disclaimer (Read Carefully)
+3) Run quick device checks from a CI job (list devices, check adb):
+- python scripts/adb_cli.py check
+- python scripts/adb_cli.py list
 
-AndroidX is a toolset intended for professional security assessments, education, and authorized penetration testing only. Use of AndroidX against systems or devices for which you do not have explicit, written permission is illegal and unethical.
+4) Generate a report after tests:
+- python scripts/generate_report.py --findings findings.json --out report.html --format html
 
-By using AndroidX you confirm that:
-- You own the device or application under test, OR
-- You have explicit written authorization from the device owner or organization to perform the testing.
+---
 
-The authors and contributors assume no responsibility for misuse. Unauthorized activities may lead to civil and criminal liability.
-
-If you are unsure whether you have permission to test a target, do not proceed and obtain written authorization first.
-
-
-## Installation
-
-Follow the instructions for your OS below.
-
-### Windows 10 / Windows 11
-
-1) Install Python 3.8+ and ensure `python` or `py` is on your PATH.
-2) Install Android Platform Tools (adb):
-   - Download "platform-tools" from Google and add the folder containing adb.exe to your PATH environment variable.
-   - Verify: open PowerShell or Windows Terminal and run `adb version`.
-3) Clone this repository and create a virtual environment:
-   ```powershell
-   git clone https://github.com/unidentifiedcyberghost/Android.git
-   cd Android
-   py -3 -m venv venv
-   venv\Scripts\Activate.ps1    # PowerShell
-   # or: venv\Scripts\activate.bat  (cmd.exe)
-   pip install -r requirements.txt
-   ```
-4) Run AndroidX:
-   ```powershell
-   py AndroidX.py
-   # or
-   python AndroidX.py
-   ```
-
-Notes for Windows:
-- Use Windows Terminal or PowerShell for best ANSI/color support.
-- If `scrcpy` is not available on Windows, remote-screen features will be disabled (the CLI detects this).
-
-
-### Linux (Debian/Ubuntu example)
-
-1) Install Python 3.8+ and git.
-2) Install adb and scrcpy (optional):
-   ```bash
-   sudo apt update
-   sudo apt install -y adb scrcpy
-   ```
-3) Clone and install dependencies:
-   ```bash
-   git clone https://github.com/unidentifiedcyberghost/Android.git
-   cd Android
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-4) Run AndroidX:
-   ```bash
-   python3 AndroidX.py
-   ```
-
-
-## Quick Usage Guide
-
-AndroidX supports two primary modes: interactive menu mode and CLI (flags) mode.
-
-### Interactive Mode (Recommended)
-
-Start the interactive UI:
-```bash
-python3 AndroidX.py
-# or
-py AndroidX.py
-```
-
-The interactive mode shows the animated banner, a system status panel, and a menu of modules. Navigate the options by entering the menu numbers.
-
-Example flow:
-- 1 → Device Manager → list devices → select a device → take screenshot
-- 2 → APK Static Analyzer → provide APK path → generate JSON/HTML report
-
-
-### CLI Mode (Scriptable)
-
-Use flags to automate tasks in scripts or CI. Examples:
-
-- List connected devices:
-  ```bash
-  python3 AndroidX.py --devices
-  ```
-
-- Full device info:
-  ```bash
-  python3 AndroidX.py --device ABC123 --info
-  ```
-
-- Analyze APK and produce HTML report:
-  ```bash
-  python3 AndroidX.py --apk target.apk --report html --target-name "com.example.app"
-  ```
-
-- Port scan device IP:
-  ```bash
-  python3 AndroidX.py --device ABC123 --port-scan
-  ```
-
-- Full vulnerability scan on device:
-  ```bash
-  python3 AndroidX.py --device ABC123 --vuln-scan --pkg com.example.app
-  ```
-
-- Capture last 200 lines of logcat:
-  ```bash
-  python3 AndroidX.py --device ABC123 --logcat 200
-  ```
-
-- Enable ADB over WiFi:
-  ```bash
-  python3 AndroidX.py --device ABC123 --adb-wifi
-  ```
-
-Run `python3 AndroidX.py --help` to see the full list of CLI flags and options.
-
-
-## Optional Packaging
-
-If you prefer a standalone executable (Windows .exe or Linux single-file binary), I can produce PyInstaller builds. Let me know which platforms you want and I will prepare release binaries.
-
-
-## Configuration & Safety
-
-- You can toggle the animated banner by editing the `AndroidX.py` file (comment out `animate_glitch_banner()` call inside `print_banner()`), or I can add a `--no-banner` flag if you want.
-- A safe-mode option can be added to disable payload/exploit features; ask me and I will implement it.
-
-
-## Troubleshooting
-
-- "adb not found": ensure Android Platform Tools are installed and `adb` is on PATH.
-- Colors/animations look broken on Windows cmd: use Windows Terminal or PowerShell, or disable banner animations.
-- msfvenom or scrcpy features show "not found": install those external tools if you need those features.
-
-
-## Contributing
-
-Contributions are welcome. Open an issue or PR if you want new features, bug fixes, or packaging help.
-
-
-## License
-
-MIT License — see LICENSE file. The original license is preserved. Redistribution and modification are permitted under the MIT terms.
+## Next steps
+- Add more wrapper scripts for payload generation, exploit engine calls, and automated vulnerability scans.
+- Optionally add a `--quiet` flag to AndroidX.py to produce pure JSON outputs for automation.
+- If you want, I can commit these scripts and the README updates on a branch and open a PR for you.
