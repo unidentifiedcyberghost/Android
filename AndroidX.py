@@ -60,7 +60,7 @@ BANNER_ART = r"""
 """
 
 BANNER_LINES_GRADIENT = [
-    "blue", "bright_blue", "yellow", "bright_yellow", "red", "bright_red"
+    "cyan", "bright_cyan", "yellow", "bright_yellow", "red", "bright_red"
 ]
 
 DEV_CREDIT_LINE = "(developed by https://github.com/unidentifiedcyberghost x https://github.com/pinoyunknown : white-hat : Philippine Cybersecurity Experts)"
@@ -128,17 +128,17 @@ def print_banner():
     console.print(Align.center(Text(DEV_CREDIT_LINE, style="bold white")))
     console.print()
 
-    tagline = Text("◈ ADVANCED ANDROID PENTESTING FRAMEWORK ◈", style="bold italic bright_magenta")
+    tagline = Text("◈ ADVANCED ANDROID PENTESTING FRAMEWORK ◈", style="bold italic bright_cyan")
     console.print(Align.center(tagline))
     console.print()
 
     status_text = get_banner_status()
     console.print(Align.center(Panel(
         status_text,
-        border_style="magenta",
-        box=box.HORIZONTALS,
+        border_style="cyan",
+        box=box.ROUNDED,
         padding=(0, 2),
-        title="[bold magenta]System Status[/]",
+        title="[bold cyan]System Status[/]",
         title_align="left"
     )))
     console.print()
@@ -146,7 +146,7 @@ def print_banner():
 
 # ════════════════════════════════════════════════════════════════
 #  MAIN MENU, HANDLERS, SESSION STORAGE, CLI
-# ════════════════���═══════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════
 
 MENU_OPTIONS = [
     ("1",  "📱", "Device Manager",          "List & manage connected Android devices"),
@@ -207,42 +207,42 @@ def _get_session() -> dict:
 
 def print_main_menu():
     t = Table(
-        title=f"\n[bold magenta]👻  {TOOL_NAME}  —  Main Menu[/]\n",
-        box=box.DOUBLE_EDGE,
-        border_style="magenta",
-        header_style="bold cyan",
+        title=f"\n[bold cyan]👻  {TOOL_NAME}  —  Main Menu[/]\n",
+        box=box.ROUNDED,
+        border_style="cyan",
+        header_style="bold white",
         show_lines=True,
         min_width=70,
     )
     t.add_column("  #  ",   style="bold cyan",   width=5,  no_wrap=True)
-    t.add_column("  ",      style="",             width=4,  no_wrap=True, justify="center")
-    t.add_column("Module",  style="bold white",   min_width=24)
-    t.add_column("Description", style="dim",      min_width=34)
+    t.add_column("  ",      style="bold cyan",   width=4,  no_wrap=True, justify="center")
+    t.add_column("Module",  style="bold bright_cyan",   min_width=24)
+    t.add_column("Description", style="bright_cyan",      min_width=34)
 
     for num, icon, name, desc in MENU_OPTIONS:
-        style = "on #1a0030" if num == "0" else ""
-        t.add_row(f"[bold cyan] {num} [/]", icon, name, desc, style=style)
+        style = "on #001a1a" if num == "0" else ""
+        t.add_row(f"[bold cyan] {num} [/]", icon, f"[bright_cyan]{name}[/]", f"[cyan]{desc}[/]", style=style)
 
     console.print(t)
 
 
 def print_remote_control_menu():
     t = Table(
-        title=f"\n[bold magenta]🎛️  {TOOL_NAME}  —  Remote Control[/]\n",
-        box=box.DOUBLE_EDGE,
-        border_style="magenta",
-        header_style="bold cyan",
+        title=f"\n[bold cyan]🎛️  {TOOL_NAME}  —  Remote Control[/]\n",
+        box=box.ROUNDED,
+        border_style="cyan",
+        header_style="bold white",
         show_lines=True,
         min_width=70,
     )
     t.add_column("  #  ",   style="bold cyan",   width=5,  no_wrap=True)
-    t.add_column("  ",      style="",             width=3,  no_wrap=True)
-    t.add_column("Module",  style="bold white",   min_width=24)
-    t.add_column("Description", style="dim",      min_width=38)
+    t.add_column("  ",      style="bold cyan",             width=3,  no_wrap=True)
+    t.add_column("Module",  style="bold bright_cyan",   min_width=24)
+    t.add_column("Description", style="bright_cyan",      min_width=38)
 
     for num, icon, name, desc in REMOTE_CONTROL_OPTIONS:
-        style = "on #1a0030" if num == "0" else ""
-        t.add_row(f"[bold cyan] {num} [/]", icon, name, desc, style=style)
+        style = "on #001a1a" if num == "0" else ""
+        t.add_row(f"[bold cyan] {num} [/]", icon, f"[bright_cyan]{name}[/]", f"[cyan]{desc}[/]", style=style)
 
     console.print(t)
 
@@ -253,7 +253,7 @@ def select_device() -> str:
         return None
     if len(devices) == 1:
         dev = devices[0]["serial"]
-        console.print(f"[green]Auto-selected device:[/] {dev}")
+        console.print(f"[bright_cyan]Auto-selected device:[/] {dev}")
         return dev
     serial = Prompt.ask("[cyan]Enter device serial[/]")
     return serial
@@ -262,7 +262,7 @@ def select_device() -> str:
 # Module handlers (simplified references to modules)
 
 def handle_device_manager():
-    console.rule("[bold magenta]📱 Device Manager[/]")
+    console.rule("[bold cyan]📱 Device Manager[/]")
     adb_manager.check_adb()
     device_id = select_device()
     if not device_id:
@@ -271,16 +271,16 @@ def handle_device_manager():
 
 
 def handle_apk_analyzer():
-    console.rule("[bold magenta]🔎 APK Static Analyzer[/]")
+    console.rule("[bold cyan]🔎 APK Static Analyzer[/]")
     apk_path = Prompt.ask("[cyan]APK file path[/]")
     findings  = apk_analyzer.analyze_apk(apk_path)
     if Confirm.ask("[cyan]Save findings to report?[/]", default=True):
         _save_to_session(findings, "apk_analysis")
-        console.print("[green]✓ Added to session report.[/]")
+        console.print("[bright_cyan]✓ Added to session report.[/]")
 
 
 def handle_network_scanner():
-    console.rule("[bold magenta]🌐 Network Scanner[/]")
+    console.rule("[bold cyan]🌐 Network Scanner[/]")
     choice = Prompt.ask("[cyan]Scan mode[/]", choices=["device", "host", "wifi", "discover", "mitm"], default="device")
 
     if choice == "device":
@@ -289,7 +289,7 @@ def handle_network_scanner():
             return
         ip = network_scanner.get_device_ip(device_id)
         if ip:
-            console.print(f"[green]Device IP:[/] {ip}")
+            console.print(f"[bright_cyan]Device IP:[/] {ip}")
             network_scanner.port_scan(ip)
         else:
             console.print("[red]Could not determine device IP.[/]")
@@ -319,7 +319,7 @@ def handle_network_scanner():
 
 
 def handle_vulnerability_scanner():
-    console.rule("[bold magenta]🚨 Vulnerability Scanner[/]")
+    console.rule("[bold cyan]🚨 Vulnerability Scanner[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -329,7 +329,7 @@ def handle_vulnerability_scanner():
 
 
 def handle_exploit_engine():
-    console.rule("[bold magenta]💥 Exploit Engine[/]")
+    console.rule("[bold cyan]💥 Exploit Engine[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -378,7 +378,7 @@ def handle_exploit_engine():
 
 
 def handle_payload_generator():
-    console.rule("[bold magenta]🎯 Payload Generator[/]")
+    console.rule("[bold cyan]🎯 Payload Generator[/]")
     payload_generator.payload_menu()
     choice = Prompt.ask("[red]Select payload type[/]", choices=["1", "2", "3", "4", "5", "0"])
 
@@ -415,7 +415,7 @@ def handle_payload_generator():
 
 
 def handle_report_generator():
-    console.rule("[bold magenta]📋 Report Generator[/]")
+    console.rule("[bold cyan]📋 Report Generator[/]")
     target = Prompt.ask("[cyan]Target description (app/device name)[/], default=\"Unknown Target\"")
 
     data = _get_session()
@@ -436,7 +436,7 @@ def handle_report_generator():
 
 
 def handle_adb_wifi():
-    console.rule("[bold magenta]📡 ADB WiFi Connect[/]")
+    console.rule("[bold cyan]📡 ADB WiFi Connect[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -445,7 +445,7 @@ def handle_adb_wifi():
 
 
 def handle_auto_adb_wifi():
-    console.rule("[bold magenta]⚡ Auto ADB WiFi Connect[/]")
+    console.rule("[bold cyan]⚡ Auto ADB WiFi Connect[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -453,17 +453,17 @@ def handle_auto_adb_wifi():
 
 
 def handle_screenshot():
-    console.rule("[bold magenta]📸 Screenshot Capture[/]")
+    console.rule("[bold cyan]📸 Screenshot Capture[/]")
     device_id = select_device()
     if not device_id:
         return
     path = adb_manager.take_screenshot(device_id)
     if path:
-        console.print(f"[bold green]✓ Screenshot saved:[/] {path}")
+        console.print(f"[bold bright_cyan]✓ Screenshot saved:[/] {path}")
 
 
 def handle_package_manager():
-    console.rule("[bold magenta]📦 Package Manager[/]")
+    console.rule("[bold cyan]📦 Package Manager[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -474,7 +474,7 @@ def handle_package_manager():
 
 
 def handle_logcat():
-    console.rule("[bold magenta]🐛 Logcat Analyzer[/]")
+    console.rule("[bold cyan]🐛 Logcat Analyzer[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -483,7 +483,7 @@ def handle_logcat():
 
 
 def handle_ssl_check():
-    console.rule("[bold magenta]🔐 SSL Pinning Check[/]")
+    console.rule("[bold cyan]🔐 SSL Pinning Check[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -492,7 +492,7 @@ def handle_ssl_check():
 
 
 def handle_file_transfer():
-    console.rule("[bold magenta]📂 File Transfer[/]")
+    console.rule("[bold cyan]📂 File Transfer[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -508,7 +508,7 @@ def handle_file_transfer():
 
 
 def handle_adb_shell():
-    console.rule("[bold magenta]💻 Interactive ADB Shell[/]")
+    console.rule("[bold cyan]💻 Interactive ADB Shell[/]")
     device_id = select_device()
     if not device_id:
         return
@@ -531,7 +531,7 @@ def open_remote_screen(device_id: str) -> bool:
     ]
     try:
         subprocess.Popen(cmd)
-        console.print("[bold green]Remote Screen launched.[/]")
+        console.print("[bold bright_cyan]Remote Screen launched.[/]")
         return True
     except FileNotFoundError:
         console.print("[bold red]scrcpy not found.[/] Install it with: [bold cyan]sudo apt install scrcpy[/]")
@@ -565,20 +565,20 @@ def handle_remote_control():
 def handle_about():
     about = Panel(
         f"\n"
-        f"  [bold magenta]👻  {TOOL_NAME} v{VERSION}[/]\n\n"
-        f"  [bold cyan]Advanced Android Penetration Testing Framework[/]\n\n"
+        f"  [bold cyan]👻  {TOOL_NAME} v{VERSION}[/]\n\n"
+        f"  [bold bright_cyan]Advanced Android Penetration Testing Framework[/]\n\n"
         f"  [white]A comprehensive tool for ethical hackers and security professionals.\n"
         f"  Covers static APK analysis, dynamic runtime analysis via ADB,\n"
         f"  network scanning, vulnerability mapping, exploit assistance,\n"
         f"  payload generation, and professional report generation.[/]\n\n"
-        f"  [bold magenta]Author   :[/] [white]{AUTHOR}[/]\n"
-        f"  [bold magenta]Contact  :[/] [cyan]{INSTAGRAM}[/]\n"
-        f"  [bold magenta]Built by :[/] [white]AndroidX Community[/]\n"
-        f"  [bold magenta]Year     :[/] [white]{YEAR}[/]\n\n"
+        f"  [bold cyan]Author   :[/] [white]{AUTHOR}[/]\n"
+        f"  [bold cyan]Contact  :[/] [bright_cyan]{INSTAGRAM}[/]\n"
+        f"  [bold cyan]Built to :[/] [white]Build to Exploit Android Devices using AndroidX[/]\n"
+        f"  [bold cyan]Year     :[/] [white]{YEAR}[/]\n\n"
         f"  [bold red]⚠  For authorized penetration testing use only.[/]\n"
         f"  [dim]Unauthorized use is illegal and unethical.[/]\n",
         title="[bold]About AndroidX[/]",
-        border_style="magenta",
+        border_style="cyan",
         padding=(0, 4),
     )
     console.print(about)
@@ -627,7 +627,7 @@ def interactive_mode():
         choice = Prompt.ask("\n[bold cyan]AndroidX ▶[/]", choices=valid_choices, show_choices=False)
 
         if choice == "0":
-            console.print("\n[bold magenta]👻 Exiting AndroidX. Stay ethical.[/]\n")
+            console.print("\n[bold bright_cyan]👻 Exiting AndroidX. Stay ethical.[/]\n")
             sys.exit(0)
 
         handler = HANDLER_MAP.get(choice)
@@ -748,7 +748,7 @@ def cli_mode(args):
     apk_data = {}
 
     if args.version:
-        console.print(f"[bold magenta]{TOOL_NAME}[/] v[bold cyan]{VERSION}[/] by [bold]{AUTHOR}[/]")
+        console.print(f"[bold cyan]{TOOL_NAME}[/] v[bold bright_cyan]{VERSION}[/] by [bold]{AUTHOR}[/]")
         return
 
     if args.devices:
@@ -895,5 +895,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        console.print("\n\n[bold magenta]👻 AndroidX interrupted. Stay ethical.[/]\n")
+        console.print("\n\n[bold bright_cyan]👻 AndroidX interrupted. Stay ethical.[/]\n")
         sys.exit(0)
